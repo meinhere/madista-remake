@@ -1,0 +1,1057 @@
+<!-- index admin -->
+<!DOCTYPE html>
+<html lang="en">
+
+<?php
+include "../koneksi.php";
+include "control.php";
+include "auth.php";
+
+?>
+
+<head>
+    <title>Admin</title>
+</head>
+<?php
+include 'template/head.php';
+?>
+
+<body>
+    <script>
+        $(document).ready(function() {
+            $('#dt').DataTable();
+        });
+    </script>
+
+    <div class="container-fluid">
+        <div class="row flex-nowrap">
+            <?php
+            include 'template/sidebar.php';
+            ?>
+            <div class="col py-3">
+                <div class="container">
+                    <h3>Dashboard</h3>
+                    <br>
+                    <br>
+                    <button id="modal" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#add" data-id="" data-nama_umkm="" data-alamat="" data-telepon="" data-status="add">
+                        <i class="fa fa-plus"></i>&nbsp;&nbsp;Tambah Data
+                    </button>
+                    <p></p>
+                    <div class="row">
+                        <div class="col">
+                            <div class="table-responsive">
+                                <table class="table table-hover cell-border" id="dt">
+                                    <thead>
+                                        <tr>
+                                            <th style="width: 5%;">No.</th>
+                                            <th style="width: 85%;">Gambar</th>
+                                            <th style="width: 10%;">#</th>
+                                        </tr>
+                                    </thead>
+                                    <?php
+                                    $query = "SELECT * FROM tb_slider ORDER BY id_slider DESC";
+                                    $sql = mysqli_query($conn, $query);
+                                    $no = 1;
+                                    ?>
+                                    <tbody>
+                                        <?php
+                                        while ($result = mysqli_fetch_assoc($sql)) {
+                                        ?>
+                                            <tr>
+                                                <td>
+                                                    <center><?php echo $no++; ?>.</center>
+                                                </td>
+                                                <td><img width="100%" src="../slider/<?php echo $result['foto_slider']; ?>" alt=""></td>
+                                                <td>
+                                                    <a onclick="return confirm('Apakah Anda Yakin Hapus Data ?');" href="index.php?hapus=<?php echo $result['id_slider']; ?>" class="btn btn-danger btn-sm">
+                                                        <i class="fa fa-trash"></i>
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        <?php
+                                        }
+                                        ?>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Modal -->
+    <div class="modal fade" id="add" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Tambah Data</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form action="" method="POST" enctype="multipart/form-data">
+                        <div class="container p-3">
+                            <input type="hidden" name="id_slider" id="id_slider">
+                            <div class="mb-3 mt-3 row">
+                                <label class="col-sm-4 col-form-label">Gambar Slider</label>
+                                <div class="col-sm-8">
+                                    <input required type="file" name="foto" id="foto" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button id="proses" type="submit" class="btn btn-primary">
+                                <i class="fa fa-save"></i>&nbsp; <span id="pros">Simpan</span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <?php
+    if (isset($_POST['add'])) {
+        $data = array(
+            "gambar" => $_FILES['foto'],
+        );
+        add_slider($data);
+    }
+    if (isset($_GET['hapus'])) {
+        $data = array(
+            "id" => $_GET['hapus'],
+        );
+        dell_slider($data);
+    }
+    ?>
+</body>
+
+<script>
+    $(document).on("click", "#modal", function() {
+
+        var id = $(this).data('id');
+        var nama_umkm = $(this).data('nama_umkm');
+        var alamat_umkm = $(this).data('alamat');
+        var telepon = $(this).data('telepon');
+
+        var status = $(this).data('status');
+
+        //alert(status);
+        if (status == "add") {
+            $(".modal-footer #proses").attr("name", "add");
+            $(".modal-footer #pros").text("Tambahkan");
+        } else if (status == "edit") {
+            $(".modal-footer #proses").attr("name", "edit");
+            $(".modal-footer #pros").text("Simpan Perubahan");
+        }
+
+        $(".modal-body #id_umkm").val(id);
+        $(".modal-body #nama_umkm").val(nama_umkm);
+        $(".modal-body #alamat_umkm").val(alamat_umkm);
+        $(".modal-body #telepon").val(telepon);
+        //alert(nama);
+    });
+</script>
+
+</html>
+
+<!-- head -->
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- JQuery -->
+<script type="text/javascript" src="../js/jquery-3.6.0.min.js"></script>
+
+<!-- bootstrap -->
+<link rel="stylesheet" href="../umkm/css/bootstrap.min.css">
+<script src="../umkm/js/bootstrap.bundle.min.js"></script>
+
+<!-- font awesome -->
+<link rel="stylesheet" href="../umkm/fontawesome/css/font-awesome.min.css">
+
+<link rel="stylesheet" type="text/css" href="../datatables/datatables.min.css" />
+
+<script type="text/javascript" src="../datatables/datatables.min.js"></script>
+
+<!-- sidebar -->
+<div class="col-auto col-md-3 col-xl-2 px-sm-2 px-0 bg-dark">
+
+    <div class="d-flex flex-column align-items-center align-items-sm-start px-3 pt-2 text-white min-vh-100">
+        <a href="/" class="d-flex align-items-center pb-3 mb-md-0 me-md-auto text-white text-decoration-none">
+            <span class="fs-5 d-none d-sm-inline">Menu</span>
+        </a>
+        <ul class="nav nav-pills flex-column mb-sm-auto mb-0 align-items-center align-items-sm-start" id="menu">
+            <li>
+                <a href="index.php" class="nav-link px-0 align-middle">
+                    <i class="fa fa-dashboard"></i> <span class="ms-1 d-none d-sm-inline">Dashboard</span>
+                </a>
+            </li>
+            <li>
+                <a href="data_umkm.php" class="nav-link px-0 align-middle">
+                    <i class="fa fa-book"></i> <span class="ms-1 d-none d-sm-inline">Data UMKM</span>
+                </a>
+            </li>
+            <li>
+                <a href="kategori.php" class="nav-link px-0 align-middle">
+                    <i class="fa fa-book"></i> <span class="ms-1 d-none d-sm-inline">Data Kategori</span>
+                </a>
+            </li>
+            <li>
+                <a href="produk.php" class="nav-link px-0 align-middle">
+                    <i class="fa fa-book"></i> <span class="ms-1 d-none d-sm-inline">Data Produk</span>
+                </a>
+            </li>
+            <li>
+                <a href="logout.php" class="nav-link px-0 align-middle">
+                    <i class="fa fa-sign-out"></i> <span class="ms-1 d-none d-sm-inline">Logout</span>
+                </a>
+            </li>
+        </ul>
+        <hr>
+    </div>
+</div>
+
+<!-- kategori -->
+<!DOCTYPE html>
+<html lang="en">
+
+<?php
+include "../koneksi.php";
+include "control.php";
+include "auth.php";
+?>
+
+<head>
+    <title>Admin</title>
+</head>
+<?php
+include 'template/head.php';
+?>
+
+<body>
+    <script>
+        $(document).ready(function() {
+            $('#dt').DataTable();
+        });
+    </script>
+
+    <div class="container-fluid">
+        <div class="row flex-nowrap">
+            <?php
+            include 'template/sidebar.php';
+            ?>
+            <div class="col py-3">
+                <div class="container">
+                    <h3>Data Kategori</h3>
+                    <br>
+                    <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#add">
+                        <i class="fa fa-plus"></i>&nbsp;&nbsp;Tambah Data
+                    </button>
+                    <p></p>
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="table-responsive">
+                                <table class="table table-hover cell-border" id="dt">
+                                    <thead>
+                                        <tr>
+                                            <th>No.</th>
+                                            <th>Kategori</th>
+                                            <th>#</th>
+                                        </tr>
+                                    </thead>
+                                    <?php
+                                    $query = "SELECT * FROM tb_kategori";
+                                    $sql = mysqli_query($conn, $query);
+                                    $no = 1;
+                                    ?>
+                                    <tbody>
+                                        <?php
+                                        while ($result = mysqli_fetch_assoc($sql)) {
+                                        ?>
+                                            <tr>
+                                                <td>
+                                                    <center><?php echo $no++; ?>.</center>
+                                                </td>
+                                                <td><?php echo $result['nama_kategori']; ?></td>
+                                                <td>
+                                                    <a onclick="return confirm('Apakah Anda Yakin Hapus Data ?');" href="kategori.php?hapus=<?php echo $result['id_kategori']; ?>" class="btn btn-danger btn-sm">
+                                                        <i class="fa fa-trash"></i>
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        <?php
+                                        }
+                                        ?>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Modal -->
+    <div class="modal fade" id="add" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Tambah Data</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form action="" method="POST">
+                    <div class="modal-body">
+                        <div class="mb-3 mt-3">
+                            <input required type="text" name="kat" class="form-control" id="kategori" placeholder="Kategori">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" name="submit" class="btn btn-primary">
+                            <i class="fa fa-save"></i>&nbsp;&nbsp; Simpan
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <?php
+    if (isset($_POST['submit'])) {
+        $data = array(
+            "nama_kategori" => $_POST['kat'],
+        );
+        add_kategori($data);
+    }
+    if (isset($_GET['hapus'])) {
+        $data = array(
+            "id" => $_GET['hapus'],
+        );
+        dell_kategori($data);
+    }
+    ?>
+</body>
+
+</html>
+
+<!-- logout -->
+<?php
+session_start();
+
+session_destroy();
+header("Location: ../index.php");
+exit();
+
+// produk
+<!DOCTYPE html>
+<html lang="en">
+
+<?php
+include "../koneksi.php";
+include "control.php";
+include "auth.php";
+?>
+
+<head>
+    <title>Admin</title>
+</head>
+<?php
+include 'template/head.php';
+?>
+
+<body>
+    <script>
+        $(document).ready(function() {
+            $('#dt').DataTable();
+        });
+    </script>
+
+    <div class="container-fluid">
+        <div class="row flex-nowrap">
+            <?php
+            include 'template/sidebar.php';
+            ?>
+            <div class="col py-3">
+                <div class="container">
+                    <h3>Data Produk</h3>
+                    <br>
+                    <button id="modal" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#kelola" href="#" class="btn btn-success btn-sm" data-id_product="" data-nama="" data-deskripsi="" data-harga="" data-stok="" data-kategori="" data-umkm="" data-status="add">
+                        <i class="fa fa-plus"></i>&nbsp;&nbsp;Tambah Data
+                    </button>
+                    <p></p>
+                    <div class="row">
+                        <div class="col">
+                            <div class="table-responsive">
+                                <table class="table table-hover cell-border" id="dt">
+                                    <thead>
+                                        <tr>
+                                            <th style="width: 5%;">No.</th>
+                                            <th style="width: 10%;">Barang</th>
+                                            <th style="width: 20%;">Deskripsi</th>
+                                            <th style="width: 15%;">Harga</th>
+                                            <th style="width: 5%;">Stok</th>
+                                            <th style="width: 10%;">Kategori</th>
+                                            <th style="width: 10%;">Produksi</th>
+                                            <th style="width: 15%;">Gambar</th>
+                                            <th style="width: 20%;">#</th>
+                                        </tr>
+                                    </thead>
+                                    <?php
+                                    $query = "SELECT * FROM tb_product LEFT JOIN tb_kategori ON tb_product.id_kategori = tb_kategori.id_kategori LEFT JOIN tb_umkm ON tb_product.id_umkm = tb_umkm.id_umkm ORDER BY id_product DESC;";
+                                    //echo $query;
+                                    $sql = mysqli_query($conn, $query);
+                                    $no = 1;
+                                    $a = 1;
+                                    ?>
+                                    <tbody>
+                                        <?php
+                                        while ($result = mysqli_fetch_assoc($sql)) {
+                                        ?>
+                                            <tr>
+                                                <td>
+                                                    <center><?php echo $no++; ?>.</center>
+                                                </td>
+                                                <td><?php echo $result['nama_product']; ?></td>
+                                                <td><?php echo $result['detil_product']; ?></td>
+                                                <td><?php echo rupiah($result['harga_product']); ?></td>
+                                                <td><?php echo $result['stok_product']; ?></td>
+                                                <td><?php echo $result['nama_kategori']; ?></td>
+                                                <td><?php echo $result['nama_umkm']; ?></td>
+                                                <td>
+                                                    <center>
+                                                        <img src="img/<?php echo $result['gambar_product']; ?>" alt="" width="100px">
+                                                    </center>
+                                                </td>
+                                                <td>
+                                                    <a onclick="return confirm('Apakah Anda Yakin Hapus Data ?');" href="produk.php?hapus=<?php echo $result['id_product']; ?>" class="btn btn-danger btn-sm">
+                                                        <i class="fa fa-trash"></i>
+                                                    </a>
+                                                    <a id="modal" data-bs-toggle="modal" data-bs-target="#kelola" href="#" class="btn btn-success btn-sm" data-id_product="<?php echo $result['id_product']; ?>" data-nama="<?php echo $result['nama_product']; ?>" data-deskripsi="<?php echo $result['detil_product']; ?>" data-harga="<?php echo $result['harga_product']; ?>" data-stok="<?php echo $result['stok_product']; ?>" data-kategori="<?php echo $result['id_kategori']; ?>" data-umkm="<?php echo $result['id_umkm']; ?>" data-status="edit">
+                                                        <i class="fa fa-pencil"></i>
+                                                    </a>
+
+                                                </td>
+                                            </tr>
+                                        <?php
+                                        }
+                                        ?>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Modal -->
+    <div class="modal fade" id="kelola" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Kelola Data</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form action="" method="POST" enctype="multipart/form-data">
+                    <div class="modal-body">
+                        <input type="hidden" name="id_product" id="id_product">
+                        <div class="mb-3 mt-3 row">
+                            <label class="col-sm-4 col-form-label">Nama Produk</label>
+                            <div class="col-sm-8">
+                                <input id="nama_product" required type="text" name="nama_product" class="form-control">
+                            </div>
+                        </div>
+                        <div class="mb-3 mt-3 row">
+                            <label class="col-sm-4 col-form-label">Deskripsi</label>
+                            <div class="col-sm-8">
+                                <textarea id="deskripsi" required class="form-control" name="deskripsi" placeholder="Leave a comment here" id="floatingTextarea"></textarea>
+                            </div>
+                        </div>
+                        <div class="mb-3 mt-3 row">
+                            <label class="col-sm-4 col-form-label">Harga</label>
+                            <div class="col-sm-8">
+                                <input id="harga" required type="text" class="form-control" name="harga" placeholder="Harga">
+                            </div>
+                        </div>
+                        <div class="mb-3 mt-3 row">
+                            <label class="col-sm-4 col-form-label">Stok</label>
+                            <div class="col-sm-8">
+                                <input id="stok" required type="number" class="form-control" name="stok" placeholder="Stok">
+                            </div>
+                        </div>
+                        <?php
+                        $query1 = "SELECT * FROM tb_kategori";
+                        $sql1 = mysqli_query($conn, $query1);
+                        $no = 1;
+                        ?>
+                        <div class="mb-3 mt-3 row">
+                            <label class="col-sm-4 col-form-label">Kategori</label>
+                            <div class="col-sm-8">
+                                <select id="kategori" required name="kategori" class="form-control">
+                                    <option value="">Pilih Kategori</option>
+                                    <?php
+                                    while ($result1 = mysqli_fetch_assoc($sql1)) {
+                                    ?>
+                                        <option value="<?php echo $result1['id_kategori']; ?>"><?php echo $result1['nama_kategori']; ?></option>
+                                    <?php
+                                    }
+                                    ?>
+                                </select>
+                            </div>
+                        </div>
+                        <?php
+                        $query2 = "SELECT * FROM tb_umkm";
+                        $sql2 = mysqli_query($conn, $query2);
+                        $no = 1;
+                        ?>
+                        <div class="mb-3 mt-3 row">
+                            <label class="col-sm-4 col-form-label">UMKM</label>
+                            <div class="col-sm-8">
+                                <select id="umkm" required name="umkm" class="form-control">
+                                    <option value="">Pilih UMKM</option>
+                                    <?php
+                                    while ($result2 = mysqli_fetch_assoc($sql2)) {
+                                    ?>
+                                        <option value="<?php echo $result2['id_umkm']; ?>"><?php echo $result2['nama_umkm']; ?></option>
+                                    <?php
+                                    }
+                                    ?>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="mb-3 mt-3 row">
+                            <label class="col-sm-4 col-form-label">Gambar Product</label>
+                            <div class="col-sm-8">
+                                <input type="file" name="foto" id="foto1" class="form-control">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button id="proses" type="submit" name="submit" class="btn btn-primary">
+                            <i class="fa fa-save"></i>&nbsp; <span id="pros">Simpan</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <?php
+    if (isset($_POST['add'])) {
+        $data = array(
+            "nama_product" => $_POST['nama_product'],
+            "deskripsi" => $_POST['deskripsi'],
+            "harga" => $_POST['harga'],
+            "stok" => $_POST['stok'],
+            "kategori" => $_POST['kategori'],
+            "umkm" => $_POST['umkm'],
+            "gambar" => $_FILES['foto'],
+        );
+        add_product($data);
+    }
+    if (isset($_POST['edit'])) {
+        $data = array(
+            "id" => $_POST['id_product'],
+            "nama_product" => $_POST['nama_product'],
+            "deskripsi" => $_POST['deskripsi'],
+            "harga" => $_POST['harga'],
+            "stok" => $_POST['stok'],
+            "kategori" => $_POST['kategori'],
+            "umkm" => $_POST['umkm'],
+            "gambar" => $_FILES['foto'],
+        );
+        edit_product($data);
+    }
+    if (isset($_GET['hapus'])) {
+        $data = array(
+            "id" => $_GET['hapus'],
+        );
+        dell_product($data);
+    }
+    ?>
+</body>
+
+<script>
+    $(document).on("click", "#modal", function() {
+
+        var id_product = $(this).data('id_product');
+        var nama = $(this).data('nama');
+        var deskripsi = $(this).data('deskripsi');
+        var harga = $(this).data('harga');
+        var stok = $(this).data('stok');
+        var kategori = $(this).data('kategori');
+        var umkm = $(this).data('umkm');
+
+        var status = $(this).data('status');
+
+        //alert(status);
+        if (status == "add") {
+            $("#foto1").attr("required", "required");
+            $(".modal-footer #proses").attr("name", "add");
+            $(".modal-footer #pros").text("Tambahkan");
+        } else if (status == "edit") {
+            $(".modal-footer #proses").attr("name", "edit");
+            $(".modal-footer #pros").text("Simpan Perubahan");
+            $("#foto1").removeAttr("required");
+        }
+
+        $(".modal-body #id_product").val(id_product);
+        $(".modal-body #nama_product").val(nama);
+        $(".modal-body #deskripsi").val(deskripsi);
+        $(".modal-body #harga").val(harga);
+        $(".modal-body #stok").val(stok);
+        $(".modal-body #kategori").val(kategori);
+        $(".modal-body #umkm").val(umkm);
+        //alert(nama);
+    });
+</script>
+
+</html>
+
+// data_umkm
+<!DOCTYPE html>
+<html lang="en">
+
+<?php
+include "../koneksi.php";
+include "control.php";
+include "auth.php";
+?>
+
+<head>
+    <title>Admin</title>
+</head>
+<?php
+include 'template/head.php';
+?>
+
+<body>
+    <script>
+        $(document).ready(function() {
+            $('#dt').DataTable();
+        });
+    </script>
+
+    <div class="container-fluid">
+        <div class="row flex-nowrap">
+            <?php
+            include 'template/sidebar.php';
+            ?>
+            <div class="col py-3">
+                <div class="container">
+                    <h3>Data UMKM</h3>
+                    <br>
+                    <button id="modal" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#add" data-id="" data-nama_umkm="" data-alamat="" data-telepon="" data-status="add">
+                        <i class="fa fa-plus"></i>&nbsp;&nbsp;Tambah Data
+                    </button>
+                    <p></p>
+                    <div class="row">
+                        <div class="col">
+                            <div class="table-responsive">
+                                <table class="table table-hover cell-border" id="dt">
+                                    <thead>
+                                        <tr>
+                                            <th>No.</th>
+                                            <th>Nama UMKM</th>
+                                            <th>Alamat</th>
+                                            <th>Telepon</th>
+                                            <th>#</th>
+                                        </tr>
+                                    </thead>
+                                    <?php
+                                    $query = "SELECT * FROM tb_umkm";
+                                    $sql = mysqli_query($conn, $query);
+                                    $no = 1;
+                                    ?>
+                                    <tbody>
+                                        <?php
+                                        while ($result = mysqli_fetch_assoc($sql)) {
+                                        ?>
+                                            <tr>
+                                                <td>
+                                                    <center><?php echo $no++; ?>.</center>
+                                                </td>
+                                                <td><?php echo $result['nama_umkm']; ?></td>
+                                                <td><?php echo $result['alamat_umkm']; ?></td>
+                                                <td><?php echo $result['telepon']; ?></td>
+                                                <td>
+                                                    <a onclick="return confirm('Apakah Anda Yakin Hapus Data ?');" href="data_umkm.php?hapus=<?php echo $result['id_umkm']; ?>" class="btn btn-danger btn-sm">
+                                                        <i class="fa fa-trash"></i>
+                                                    </a>
+                                                    <a id="modal" href="#" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#add" data-id="<?php echo $result['id_umkm']; ?>" data-nama_umkm="<?php echo $result['nama_umkm']; ?>" data-alamat="<?php echo $result['alamat_umkm']; ?>" data-telepon="<?php echo $result['telepon']; ?>" data-status="edit">
+                                                        <i class="fa fa-pencil"></i>
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        <?php
+                                        }
+                                        ?>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Modal -->
+    <div class="modal fade" id="add" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Tambah Data</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form action="" method="POST">
+                        <div class="container p-3">
+                            <input type="hidden" name="id_umkm" id="id_umkm">
+                            <div class="mb-3 mt-3 row">
+                                <label for="inputPassword" class="col-sm-4 col-form-label">Nama UMKM</label>
+                                <div class="col-sm-8">
+                                    <input id="nama_umkm" required type="text" name="nama_umkm" class="form-control">
+                                </div>
+                            </div>
+                            <div class="mb-3 mt-3 row">
+                                <label for="inputPassword" class="col-sm-4 col-form-label">Alamat</label>
+                                <div class="col-sm-8">
+                                    <textarea id="alamat_umkm" required class="form-control" name="alamat" placeholder="Leave a comment here" id="floatingTextarea"></textarea>
+                                </div>
+                            </div>
+                            <div class="mb-3 mt-3 row">
+                                <label for="inputPassword" class="col-sm-4 col-form-label">Telepon</label>
+                                <div class="col-sm-8">
+                                    <input id="telepon" required type="text" class="form-control" name="telepon" placeholder="Telepon">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button id="proses" type="submit" name="submit" class="btn btn-primary">
+                                <i class="fa fa-save"></i>&nbsp; <span id="pros">Simpan</span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <?php
+    if (isset($_POST['add'])) {
+        $data = array(
+            "nama" => $_POST['nama_umkm'],
+            "alamat" => $_POST['alamat'],
+            "telepon" => $_POST['telepon']
+        );
+        add_umkm($data);
+    }
+    if (isset($_POST['edit'])) {
+        $data2 = array(
+            "id" => $_POST['id_umkm'],
+            "nama" => $_POST['nama_umkm'],
+            "alamat" => $_POST['alamat'],
+            "telepon" => $_POST['telepon']
+        );
+        edit_umkm($data2);
+    }
+    if (isset($_GET['hapus'])) {
+        $data = array(
+            "id" => $_GET['hapus'],
+        );
+        dell_umkm($data);
+    }
+    ?>
+</body>
+
+<script>
+    $(document).on("click", "#modal", function() {
+
+        var id = $(this).data('id');
+        var nama_umkm = $(this).data('nama_umkm');
+        var alamat_umkm = $(this).data('alamat');
+        var telepon = $(this).data('telepon');
+
+        var status = $(this).data('status');
+
+        //alert(status);
+        if (status == "add") {
+            $(".modal-footer #proses").attr("name", "add");
+            $(".modal-footer #pros").text("Tambahkan");
+        } else if (status == "edit") {
+            $(".modal-footer #proses").attr("name", "edit");
+            $(".modal-footer #pros").text("Simpan Perubahan");
+        }
+
+        $(".modal-body #id_umkm").val(id);
+        $(".modal-body #nama_umkm").val(nama_umkm);
+        $(".modal-body #alamat_umkm").val(alamat_umkm);
+        $(".modal-body #telepon").val(telepon);
+        //alert(nama);
+    });
+</script>
+
+</html>
+
+// control
+<?php
+include "../koneksi.php";
+
+function rupiah($angka)
+{
+
+    $hasil_rupiah = "Rp. " . number_format($angka, 0, ',', '.');
+    return $hasil_rupiah;
+}
+
+function add_kategori($data)
+{
+    $kategori = $data['nama_kategori'];
+
+    $query = "INSERT INTO tb_kategori VALUES('' , '$kategori');";
+    $sql = mysqli_query($GLOBALS['conn'], $query);
+    if ($sql) {
+        echo "<script>
+        setInterval( () => {
+            window.location.href = 'kategori.php';
+         }, 100);
+        </script>";
+    }
+}
+
+function dell_kategori($data)
+{
+    $id = $data['id'];
+    $query = "DELETE FROM tb_kategori where id_kategori = '$id';";
+    $sql = mysqli_query($GLOBALS['conn'], $query);
+    if ($sql) {
+        echo "<script>
+        setInterval( () => {
+            window.location.href = 'kategori.php';
+         }, 100);
+        </script>";
+    }
+}
+
+function add_umkm($data)
+{
+    $nama = $data['nama'];
+    $alamat = $data['alamat'];
+    $telepon = $data['telepon'];
+
+    $query = "INSERT INTO tb_umkm VALUES('' , '$nama', '$alamat', '$telepon');";
+    $sql = mysqli_query($GLOBALS['conn'], $query);
+    if ($sql) {
+        echo "<script>
+        setInterval( () => {
+            window.location.href = 'data_umkm.php';
+         }, 100);
+        </script>";
+    }
+}
+
+function edit_umkm($data)
+{
+    $id = $data['id'];
+    $nama = $data['nama'];
+    $alamat = $data['alamat'];
+    $telepon = $data['telepon'];
+
+    $query = "UPDATE tb_umkm SET nama_umkm='$nama', alamat_umkm='$alamat', telepon='$telepon' WHERE id_umkm = '$id';";
+    $sql = mysqli_query($GLOBALS['conn'], $query);
+    if ($sql) {
+        echo "<script>
+        setInterval( () => {
+            window.location.href = 'data_umkm.php';
+         }, 100);
+        </script>";
+    }
+}
+
+function dell_umkm($data)
+{
+    $id = $data['id'];
+    $query = "DELETE FROM tb_umkm where id_umkm = '$id';";
+    $sql = mysqli_query($GLOBALS['conn'], $query);
+    if ($sql) {
+        echo "<script>
+        setInterval( () => {
+            window.location.href = 'data_umkm.php';
+         }, 100);
+        </script>";
+    }
+}
+
+function add_product($data)
+{
+    $nama = $data['nama_product'];
+    $deskripsi = $data['deskripsi'];
+    $harga = $data['harga'];
+    $stok = $data['stok'];
+    $kategori = $data['kategori'];
+    $umkm = $data['umkm'];
+
+    $query = "INSERT INTO tb_product VALUES('' , '$nama', '$deskripsi', '$harga', '$stok', '$kategori', '$umkm', '-');";
+    $sql = mysqli_query($GLOBALS['conn'], $query);
+
+    $query2 = "SELECT * FROM tb_product ORDER BY id_product DESC LIMIT 1;";
+    $sql2 = mysqli_query($GLOBALS['conn'], $query2);
+    $result = mysqli_fetch_assoc($sql2);
+
+    //var_dump($result);
+    //die();
+
+    $gambar = $data['gambar']['name'];
+    $dir = "img/";
+    $split = explode('.', $gambar);
+    $ekstensi = end($split);
+    $nama_file = $result['id_product'] . "." . $ekstensi;
+    $kirim = move_uploaded_file($data['gambar']['tmp_name'], $dir . $nama_file);
+    $id_product = $result['id_product'];
+
+    $query3 = "UPDATE tb_product SET gambar_product = '$nama_file' WHERE id_product = '$id_product';";
+    $sql3 = mysqli_query($GLOBALS['conn'], $query3);
+
+    if ($sql3) {
+        echo "<script>
+        setInterval( () => {
+            window.location.href = 'produk.php';
+         }, 100);
+        </script>";
+    }
+}
+
+function dell_product($data)
+{
+    $id = $data['id'];
+
+    $query2 = "SELECT * FROM tb_product WHERE id_product = $id;";
+    $sql2 = mysqli_query($GLOBALS['conn'], $query2);
+    $result = mysqli_fetch_assoc($sql2);
+
+    $nama_foto = $result['gambar_product'];
+    $dir = "img/";
+
+    unlink($dir . $nama_foto);
+
+    $query = "DELETE FROM tb_product where id_product = '$id';";
+    $sql = mysqli_query($GLOBALS['conn'], $query);
+    if ($sql) {
+        echo "<script>
+        setInterval( () => {
+            window.location.href = 'produk.php';
+         }, 100);
+        </script>";
+    }
+}
+
+function edit_product($data)
+{
+    //var_dump($data);
+    //die();
+    $id = $data['id'];
+    $nama = $data['nama_product'];
+    $deskripsi = $data['deskripsi'];
+    $harga = $data['harga'];
+    $stok = $data['stok'];
+    $kategori = $data['kategori'];
+    $umkm = $data['umkm'];
+
+    $query = "UPDATE tb_product SET nama_product='$nama', detil_product='$deskripsi', harga_product='$harga', stok_product='$stok', id_kategori='$kategori', id_umkm='$umkm'  WHERE id_product = '$id';";
+
+    //echo $query;
+    //die();
+    $sql = mysqli_query($GLOBALS['conn'], $query);
+
+    $query2 = "SELECT * FROM tb_product WHERE id_product = '$id';";
+    $sql2 = mysqli_query($GLOBALS['conn'], $query2);
+    $result = mysqli_fetch_assoc($sql2);
+
+    $dir = "img/";
+
+    if ($data['gambar']['name'] == "") {
+        //echo "Kosong";
+    } else {
+        unlink($dir . $result['gambar_product']);
+        $gambar = $data['gambar']['name'];
+
+        $split = explode('.', $gambar);
+        $ekstensi = end($split);
+        $nama_file = $result['id_product'] . "." . $ekstensi;
+        $kirim = move_uploaded_file($data['gambar']['tmp_name'], $dir . $nama_file);
+        $id_product = $result['id_product'];
+
+        $query3 = "UPDATE tb_product SET gambar_product = '$nama_file' WHERE id_product = '$id_product';";
+        $sql3 = mysqli_query($GLOBALS['conn'], $query3);
+    }
+
+    if ($sql) {
+        echo "<script>
+        setInterval( () => {
+            window.location.href = 'produk.php';
+         }, 1000);
+        </script>";
+    }
+}
+
+function add_slider($data)
+{
+    $query = "INSERT INTO tb_slider VALUES('' , '-');";
+    $sql = mysqli_query($GLOBALS['conn'], $query);
+
+    $query2 = "SELECT * FROM tb_slider ORDER BY id_slider DESC LIMIT 1;";
+    $sql2 = mysqli_query($GLOBALS['conn'], $query2);
+    $result = mysqli_fetch_assoc($sql2);
+
+    $gambar = $data['gambar']['name'];
+    $dir = "../slider/";
+    $split = explode('.', $gambar);
+    $ekstensi = end($split);
+    $nama_file = $result['id_slider'] . "." . $ekstensi;
+    $kirim = move_uploaded_file($data['gambar']['tmp_name'], $dir . $nama_file);
+    $id_slider = $result['id_slider'];
+
+    $query3 = "UPDATE tb_slider SET foto_slider = '$nama_file' WHERE id_slider = '$id_slider';";
+    $sql3 = mysqli_query($GLOBALS['conn'], $query3);
+
+    if ($sql3) {
+        echo "<script>
+        setInterval( () => {
+            window.location.href = 'index.php';
+         }, 100);
+        </script>";
+    }
+}
+
+function dell_slider($data)
+{
+    $id = $data['id'];
+
+    $query2 = "SELECT * FROM tb_slider WHERE id_slider = $id;";
+    $sql2 = mysqli_query($GLOBALS['conn'], $query2);
+    $result = mysqli_fetch_assoc($sql2);
+
+    $nama_foto = $result['foto_slider'];
+    $dir = "../slider/";
+
+    unlink($dir . $nama_foto);
+
+    $query = "DELETE FROM tb_slider where id_slider = '$id';";
+    $sql = mysqli_query($GLOBALS['conn'], $query);
+    if ($sql) {
+        echo "<script>
+        setInterval( () => {
+            window.location.href = 'index.php';
+         }, 100);
+        </script>";
+    }
+}
+
+// auth
+<?php
+session_start();
+
+if (!isset($_SESSION['auth_admin'])) {
+    header("Location: ../index.php");
+    exit();
+}

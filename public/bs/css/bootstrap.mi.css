@@ -1,0 +1,724 @@
+<!-- index user -->
+<!DOCTYPE html>
+<html>
+
+<?php
+session_start();
+
+include "koneksi.php";
+include "auth_user.php";
+
+function rupiah($angka)
+{
+    $hasil_rupiah = "Rp. " . number_format($angka, 0, ',', '.');
+    return $hasil_rupiah;
+}
+
+if (isset($_POST['login'])) {
+    $email = $_POST['email'];
+    $password = $_POST['pass'];
+
+    $result = mysqli_query($conn, "SELECT * FROM tb_user WHERE email = '$email'");
+
+    // cek username 
+    if (mysqli_num_rows($result) === 1) {
+        // cek password
+        $row = mysqli_fetch_assoc($result);
+        if (password_verify($password, $row["password"]) && $row["hak_akses"] == 'admin') {
+            $_SESSION['auth_admin'] = true;
+            header("Location: admin/index.php");
+            exit;
+        } else if (password_verify($password, $row["password"]) && $row["hak_akses"] == 'user') {
+            $_SESSION['auth_user'] = true;
+            header("Location: index.php");
+            exit;
+        }
+    }
+    echo "<script>
+          alert('Maaf username atau password yang anda masukkan salah');
+        </script>";
+}
+
+if (isset($_POST['daftar'])) {
+    $email = stripslashes($_POST["email"]);
+    $password = mysqli_real_escape_string($conn, $_POST["pass"]);
+    $password2 = mysqli_real_escape_string($conn, $_POST["pass2"]);
+
+    // cek email sudah ada atau belum
+    $result = mysqli_query($conn, "SELECT email FROM tb_user WHERE email = '$email'");
+    $hak_akses = 'user';
+
+    if (mysqli_num_rows($result) == 0) {
+
+        // cek konfirmasi password
+        if ($password == $password2) {
+
+            // enkripsi password
+            $password = password_hash($password, PASSWORD_DEFAULT);
+
+            // tambahkan userbaru ke database
+            mysqli_query($conn, "INSERT INTO tb_user VALUES('', '$email', '$password', '$hak_akses')");
+            echo "<script>
+              alert('Pendaftaran akun telah berhasil, silahkan login');
+            </script>";
+            $_SESSION['berhasil'] = "Pendaftaran akun telah berhasil, silahkan login";
+            header("Location: index.php");
+            exit;
+        }
+    }
+    echo "<script>
+          alert('Maaf username sudah ada atau password yang anda masukkan tidak sama');
+        </script>";
+}
+
+
+
+?>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- JQuery -->
+    <script type="text/javascript" src="js/jquery-3.6.0.min.js"></script>
+
+    <!-- bootstrap -->
+    <link rel="stylesheet" href="umkm/css/bootstrap.min.css">
+    <script src="umkm/js/bootstrap.bundle.min.js"></script>
+
+    <!-- font awesome -->
+    <link rel="stylesheet" href="umkm/fontawesome/css/font-awesome.min.css">
+
+    <title>UMKM</title>
+</head>
+
+<body>
+    <?php if (isset($_SESSION['berhasil'])) : ?>
+        <script>
+            alert('<?= $_SESSION['berhasil']; ?>')
+        </script>
+        <?php session_destroy(); ?>
+    <?php endif; ?>
+    <nav class="navbar navbar-expand-lg navbar-light bg-warning">
+        <div class="container">
+            <i class="fa fa-shopping-cart mx-2 text-success fa-2x"></i>
+            <a class="navbar-brand text-dark font-weight-bold" href="index.php"><b>LAPAK UMKM</b></a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0 ">
+                    <li class="nav-item mx-1">
+                        <a class="nav-link active text-dark" aria-current="page" href="#">Beranda</a>
+                    </li>
+                    <li class="nav-item mx-1">
+                        <a class="nav-link active text-dark" aria-current="page" href="index.php?produk">Produk</a>
+                    </li>
+                    <li class="nav-item mx-1">
+                        <a class="nav-link active text-dark" aria-current="page" href="#">Tentang Kami</a>
+                    </li>
+                </ul>
+                <form class="d-flex">
+                    <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+                    <button class="btn btn-outline-success" type="submit">Search</button>
+                    <i class="fa fa-shopping-cart mx-2 mt-2 fs-4"></i>
+                    <a id="log" href="#" data-bs-toggle="modal" data-status="login" data-bs-target="#login">
+                        <i class="fa fa-user-circle mx-2 mt-2 fs-4 text-dark " aria-hidden="true"></i>
+                    </a>
+                </form>
+            </div>
+        </div>
+    </nav>
+    <?php
+    if (!isset($_GET['produk']) == 1) {
+    ?>
+        <div class="mt-2">
+            <div id="carouselExampleIndicators" class="carousel slide" data-bs-ride="carousel">
+                <div class="carousel-indicators">
+                    <?php
+                    $query = "SELECT * FROM tb_slider ORDER BY id_slider DESC";
+                    $sql = mysqli_query($conn, $query);
+                    $no = 0;
+
+                    while ($result = mysqli_fetch_assoc($sql)) {
+                    ?>
+                        <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="<?php echo $no; ?>" class="<?php if ($no == 0) {
+                                                                                                                                            echo 'active';
+                                                                                                                                        } ?>" aria-current="true" aria-label="Slide 1"></button>
+                    <?php
+                        $no++;
+                    }
+                    ?>
+                </div>
+
+                <div class="carousel-inner">
+
+                    <?php
+                    $query = "SELECT * FROM tb_slider ORDER BY id_slider DESC";
+                    $sql = mysqli_query($conn, $query);
+                    $no = 0;
+
+                    while ($result = mysqli_fetch_assoc($sql)) {
+                    ?>
+                        <div class="<?php if ($no == 0) {
+                                        echo 'carousel-item active';
+                                    } else {
+                                        echo 'carousel-item';
+                                    } ?>">
+                            <img src="slider/<?php echo $result['foto_slider']; ?>" class="d-block w-100" alt="...">
+                        </div>
+                    <?php
+                        $no++;
+                    }
+                    ?>
+                </div>
+                <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Previous</span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Next</span>
+                </button>
+            </div>
+        </div>
+    <?php
+    }
+    ?>
+    <div class="container">
+        <div class="row mt-3">
+            <div class="col-md-3 bg-light">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item bg-warning">
+                        <i class="fa fa-list mx-2" aria-hidden="true"></i>
+                        KATEGORI PRODUK
+                    </li>
+                    <?php
+
+                    $query = "SELECT * FROM tb_kategori";
+                    $sql_kategori = mysqli_query($conn, $query);
+                    while ($result = mysqli_fetch_assoc($sql_kategori)) {
+                    ?>
+                        <li class="list-group-item"><i class="fa fa-angle-right mx-3" aria-hidden="true"></i>
+                            <a href="kategori.php?kategori=<?php echo $result['id_kategori']; ?>" class="text-decoration-none text-dark"><?php echo $result['nama_kategori']; ?></a>
+                        </li>
+                    <?php
+                    }
+                    ?>
+                </ul>
+            </div>
+            <div class="col-md-9">
+                <h5 class="text-center font-weight-bold mt-3">PRODUK POPULER</h5>
+                <div class="row mt-3 mb-5">
+                    <?php
+                    if (isset($_GET['kategori'])) {
+                        $id = $_GET['kategori'];
+                        $query2 = "SELECT * FROM tb_product LEFT JOIN tb_kategori ON tb_product.id_kategori = tb_kategori.id_kategori LEFT JOIN tb_umkm ON tb_product.id_umkm = tb_umkm.id_umkm WHERE id_kategori='$id' ORDER BY id_product DESC;";
+                        //$query2 = "SELECT * FROM tb_product WHERE id_kategori='$id' ORDER BY id_product DESC;";
+                    } else {
+                        $query2 = "SELECT * FROM tb_product LEFT JOIN tb_kategori ON tb_product.id_kategori = tb_kategori.id_kategori LEFT JOIN tb_umkm ON tb_product.id_umkm = tb_umkm.id_umkm ORDER BY id_product DESC;";
+                        //$query2 = "SELECT * FROM tb_product ORDER BY id_product DESC;";
+                    }
+
+                    $sql_product = mysqli_query($conn, $query2);
+                    while ($result = mysqli_fetch_assoc($sql_product)) {
+                    ?>
+                        <div class="col-md-4 col-sm-6 col-6 col-lg-3 mb-4">
+                            <div class="card mb-1" style="width: 12rem;">
+                                <img src="admin/img/<?= $result['gambar_product']; ?>" class="card-img-top" height="170px">
+                                <div class="card-body">
+                                    <h5 class="card-title"><?= $result['nama_product']; ?></h5>
+                                    <?php
+                                    $pendek = substr($result['detil_product'], 0, 25);
+                                    ?>
+                                    <p class="card-text"><?= $pendek; ?> . . .</p>
+                                    <div class="row mt-2">
+                                        <div class="col-4 ">
+                                            <a id="det" href="#" data-bs-toggle="modal" data-gambar="<?= $result['gambar_product']; ?>" data-nama="<?= $result['nama_product']; ?>" data-stock="<?= $result['stok_product']; ?>" data-kategori="<?= $result['nama_kategori']; ?>" data-detil="<?= $result['detil_product']; ?>" data-produksi="<?= $result['nama_umkm']; ?>" data-bs-target="#detil" class="btn btn-primary btn-sm">Detail</a>
+                                        </div>
+                                        <div class="col-8 text-end">
+                                            <a href="#" class="btn btn-danger btn-sm"><?= rupiah($result['harga_product']); ?></a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    <?php
+                    }
+                    ?>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="bg-dark text-white p-2">
+        <div class="container">
+            <div class="row mt-4 mx-4">
+                <div class="col-md-4 ">
+                    <h5>Tentang Kami</h5>
+                    <ul>
+                        <li>Tentang Kami</li>
+                        <li>Syarat dan Ketentuan</li>
+                    </ul>
+                </div>
+                <div class="col-md-4 ">
+                    <h5>Layanan Pelanggan</h5>
+                    <ul>
+                        <li>Cara Pembayaran</li>
+                        <li>Masukan dan Saran</li>
+                    </ul>
+                </div>
+                <div class="col-md-4 ">
+                    <h5>Kontak Kami</h5>
+                    <ul>
+                        <li>0812-3456-7890</li>
+                        <li>Senin-Sabtu</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </footer>
+    <div class="copyright text-center text-white font-weight-bold bg-warning p-2">
+        <p>Development by Desi Rahmawati Copyright <i class="fa fa-copyright" aria-hidden="true"></i> 2022</p>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="detil" tabindex="-1" aria-labelledby="modalTitle" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalTitle">Detail Product</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="card mb-3" style="max-width: 540px;">
+                        <div class="row g-0">
+                            <div class="col-md-4">
+                                <img id="gbr" src="" class="img-fluid rounded-start mt-3">
+                            </div>
+                            <div class="col-md-8">
+                                <div class="card-body">
+                                    <span class="card-text">Jumlah Stok : </span><span id="stok"></span><br>
+                                    <span class="card-text">Kategori : </span><span id="kategori"></span><br>
+                                    <span class="card-text"><small class="text-muted">Produksi : </small><small id="produksi"></small></span><br>
+                                    <br>
+                                    <p class="card-text" id="detil"></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-danger">Beli Sekarang</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <?php
+    if (!isset($_SESSION['auth_user'])) {
+
+    ?>
+        <!-- Modal -->
+        <div class="modal fade" id="login" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Login</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <form method="post" actiondd="">
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <span>Email</span>
+                                </div>
+                                <div class="col-md-9">
+                                    <input type="text" name="email" id="email" placeholder="Email" class="form-control" required>
+                                </div>
+                            </div>
+                            <div class="row mt-3">
+                                <div class="col-md-3">
+                                    <span>Password</span>
+                                </div>
+                                <div class="col-md-9">
+                                    <input type="password" name="pass" id="pass" placeholder="Password" class="form-control" required>
+                                </div>
+                            </div>
+                            <div class="row mt-3 d-none" id="ulangPass">
+                                <div class="col-md-3">
+                                    <span>Ulangi Password</span>
+                                </div>
+                                <div class="col-md-9">
+                                    <input type="password" name="pass2" id="pass2" placeholder="Ulangi Password" class="form-control">
+                                </div>
+                            </div>
+                            <div class="mt-3" id="footer-tanya">
+                                <p class="d-inline">Belum punya akun? silahkan</p>
+                                <span id="daftar" class="text-primary text-decoration-underline status" style="cursor: pointer;">Daftar</span>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary" id="login" name="login">Login</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+    <?php
+    } else {
+
+    ?>
+        <!-- Modal -->
+        <div class="modal fade" id="login" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Logout</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <a href="logout.php" class="btn btn-danger">Logout</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    <?php
+    }
+
+    ?>
+</body>
+<script>
+    $(document).on("click", "#det", function() {
+
+        var gambar = $(this).data('gambar');
+        var nama = $(this).data('nama');
+        var stock = $(this).data('stock');
+        var kategori = $(this).data('kategori');
+        var detil = $(this).data('detil');
+        var produksi = $(this).data('produksi');
+
+        var img = "admin/img/" + gambar;
+
+        $(".modal-body #gbr").attr('src', img);
+        $(".modal-body #nama").text(nama);
+        $(".modal-body #stok").text(stock);
+        $(".modal-body #kategori").text(kategori);
+        $(".modal-body #detil").text(detil);
+        $(".modal-body #produksi").text(produksi);
+
+    });
+
+    $(document).ready(function() {
+        $('span.status').on('click', function() {
+            let status = $(this).attr('id');
+
+            if (status == 'daftar') {
+                $('.modal-title').text("Daftar Akun");
+                $('#ulangPass').attr('class', 'row mt-3 d-inherit');
+
+                $('#footer-tanya p').text('Sudah punya akun?');
+                $('#footer-tanya span').attr('id', 'login');
+                $('#footer-tanya span').text('Login');
+
+                $('#pass2').attr('required', 'required');
+
+                $('.modal-footer button[type=submit]').text('Daftar');
+                $('.modal-footer button[type=submit]').attr('name', 'daftar');
+            } else if (status == 'login') {
+                $('.modal-title').text("Login");
+                $('#ulangPass').attr('class', 'row mt-3 d-none');
+
+                $('#footer-tanya p').text('Belum punya akun?');
+                $('#footer-tanya span').attr('id', 'daftar');
+                $('#footer-tanya span').text('Daftar');
+
+                $('#pass2').removeAttr('required');
+                $('#pass2').attr('value', '');
+
+                $('.modal-footer button[type=submit]').text('Login');
+                $('.modal-footer button[type=submit]').attr('name', 'login');
+            }
+        });
+    });
+</script>
+
+</html>
+
+<!-- kategori -->
+<!DOCTYPE html>
+<html>
+
+<?php
+include "koneksi.php";
+include "auth_user.php";
+
+function rupiah($angka)
+{
+
+    $hasil_rupiah = "Rp. " . number_format($angka, 2, ',', '.');
+    return $hasil_rupiah;
+}
+
+?>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- JQuery -->
+    <script type="text/javascript" src="js/jquery-3.6.0.min.js"></script>
+
+    <!-- bootstrap -->
+    <link rel="stylesheet" href="umkm/css/bootstrap.min.css">
+    <script src="umkm/js/bootstrap.bundle.min.js"></script>
+
+    <!-- font awesome -->
+    <link rel="stylesheet" href="umkm/fontawesome/css/font-awesome.min.css">
+
+    <title>UMKM</title>
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-warning">
+        <div class="container">
+            <i class="fa fa-shopping-cart mx-2 text-success fa-2x"></i>
+            <a class="navbar-brand text-dark font-weight-bold" href="index.php"><b>LAPAK UMKM</b></a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0 ">
+                    <li class="nav-item mx-1">
+                        <a class="nav-link active text-dark" aria-current="page" href="#">Beranda</a>
+                    </li>
+                    <li class="nav-item mx-1">
+                        <a class="nav-link active text-dark" aria-current="page" href="index.php?produk">Produk</a>
+                    </li>
+                    <li class="nav-item mx-1">
+                        <a class="nav-link active text-dark" aria-current="page" href="#">Tentang Kami</a>
+                    </li>
+                </ul>
+                <form class="d-flex">
+                    <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+                    <button class="btn btn-outline-success" type="submit">Search</button>
+                    <i class="fa fa-shopping-cart mx-2 mt-2"></i>
+                    <i class="fa fa-envelope mx-2 mt-2"></i>
+                    <i class="fa fa-bell mx-2 mt-2"></i>
+                </form>
+            </div>
+        </div>
+    </nav>
+    <div class="container">
+        <div class="row mt-3">
+            <div class="col-md-3 bg-light">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item bg-warning">
+                        <i class="fa fa-list mx-2" aria-hidden="true"></i>
+                        KATEGORI PRODUK
+                    </li>
+                    <?php
+
+                    $query = "SELECT * FROM tb_kategori";
+                    $sql_kategori = mysqli_query($conn, $query);
+                    while ($result = mysqli_fetch_assoc($sql_kategori)) {
+                    ?>
+                        <li class="list-group-item"><i class="fa fa-angle-right mx-3" aria-hidden="true"></i>
+                            <a href="kategori.php?kategori=<?php echo $result['id_kategori']; ?>" class="text-decoration-none text-dark"><?php echo $result['nama_kategori']; ?></a>
+                        </li>
+                    <?php
+                    }
+                    ?>
+                </ul>
+            </div>
+            <div class="col-md-9">
+                <h5 class="text-center font-weight-bold mt-3">PRODUK POPULER</h5>
+                <div class="row mt-3 mb-5">
+                    <?php
+                    if (isset($_GET['kategori'])) {
+                        $id = $_GET['kategori'];
+                        $query2 = "SELECT * FROM tb_product WHERE id_kategori='$id' ORDER BY id_product DESC;";
+                    } else {
+                        $query2 = "SELECT * FROM tb_product ORDER BY id_product DESC;";
+                    }
+
+                    $sql_product = mysqli_query($conn, $query2);
+                    while ($result = mysqli_fetch_assoc($sql_product)) {
+                    ?>
+                        <div class="col-md-4 col-sm-6 col-6 col-lg-3 mb-4">
+                            <div class="card mb-1" style="width: 12rem;">
+                                <img src="admin/img/<?= $result['gambar_product']; ?>" class="card-img-top" height="170px">
+                                <div class="card-body">
+                                    <h5 class="card-title"><?= $result['nama_product']; ?></h5>
+                                    <?php
+                                    $pendek = substr($result['detil_product'], 0, 25);
+                                    ?>
+                                    <p class="card-text"><?= $pendek; ?> . . .</p>
+                                    <div class="row mt-2">
+                                        <div class="col-md-4 ">
+                                            <a id="nm" href="#" data-bs-toggle="modal" data-coba="welcome" data-nama="<?= $result['nama_product']; ?>" data-bs-target="#detil" class="btn btn-primary btn-sm">Detail</a>
+                                        </div>
+                                        <div class="col-md-8 text-end">
+                                            <a href="#" class="btn btn-danger btn-sm"><?= $result['harga_product']; ?></a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    <?php
+                    }
+                    ?>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="bg-dark text-white p-2">
+        <div class="container">
+            <div class="row mt-4 mx-4">
+                <div class="col-md-4 ">
+                    <h5>Tentang Kami</h5>
+                    <ul>
+                        <li>Tentang Kami</li>
+                        <li>Syarat dan Ketentuan</li>
+                    </ul>
+                </div>
+                <div class="col-md-4 ">
+                    <h5>Layanan Pelanggan</h5>
+                    <ul>
+                        <li>Cara Pembayaran</li>
+                        <li>Masukan dan Saran</li>
+                    </ul>
+                </div>
+                <div class="col-md-4 ">
+                    <h5>Kontak Kami</h5>
+                    <ul>
+                        <li>0812-3456-7890</li>
+                        <li>Senin-Sabtu</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </footer>
+    <div class="copyright text-center text-white font-weight-bold bg-warning p-2">
+        <p>Development by Desi Rahmawati Copyright <i class="fa fa-copyright" aria-hidden="true"></i> 2021</p>
+    </div>
+    <!-- Modal -->
+    <div class="modal fade" id="detil" tabindex="-1" aria-labelledby="modalTitle" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalTitle">Detail Product</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="card mb-3" style="max-width: 540px;">
+                        <div class="row g-0">
+                            <div class="col-md-4">
+                                <img src="umkm/img/h.jpg" class="img-fluid rounded-start mt-3">
+                            </div>
+                            <div class="col-md-8">
+                                <div class="card-body">
+                                    <span class="card-text">Jumlah Stok : 20 Biji</span>
+                                    <span class="card-text">Kategori : Kuliner</span>
+                                    <span class="card-text"><small class="text-muted">Produksi : Wahana Cipta</small></span>
+                                    <p class="card-text">Dumbleg merupakan jajanan tradisional khas Nganjuk. Makanan ini terbuat dari tepung beras atau ketan.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-danger">Beli Sekarang</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+<script>
+    $(document).on("click", "#nm", function() {
+        let nama = $(this).data('nama');
+
+        $('#modalTitle').text(`Detail Product : ${nama}`);
+    });
+</script>
+
+</html>
+
+<!-- koneksi -->
+<?php
+$host = "localhost";
+$user = "root";
+$pass = "";
+$db = "lapakumkm";
+
+$conn = mysqli_connect($host, $user, $pass, $db);
+
+if (!$conn) {
+    echo "gagal konek database menn";
+} else {
+    //echo "Berhasil";
+};
+
+// logout
+<?php
+session_start();
+
+session_destroy();
+header("Location: index.php");
+exit();
+
+// function
+<?php
+// koneksi ke database
+$conn = mysqli_connect("localhost", "root", "", "phpdasar");
+
+function registrasi($data)
+{
+    global $conn;
+
+    $username = strtolower(stripslashes($data["username"]));
+    $password = mysqli_real_escape_string($conn, $data["password"]);
+    $password2 = mysqli_real_escape_string($conn, $data["password2"]);
+
+    // cek username sudah ada atau belum
+    $result = mysqli_query($conn, "SELECT username FROM user WHERE username = '$username'");
+
+    if (mysqli_fetch_assoc($result)) {
+        echo "<script>
+				alert('username sudah terdaftar')
+			  </script>";
+        return false;
+    }
+
+    // cek konfirmasi password
+    if ($password !== $password2) {
+        echo "<script>
+				alert('konfirmasi password tidak sesuai!');
+			  </script>";
+        return false;
+    }
+
+    // enkripsi password
+    $password = password_hash($password, PASSWORD_DEFAULT);
+
+    // tambahkan userbaru ke database
+    mysqli_query($conn, "INSERT INTO user VALUES('', '$username', '$password')");
+
+    return mysqli_affected_rows($conn);
+}
+
+// auth_user
+<?php
+
+if (isset($_SESSION['auth_admin'])) {
+    header("Location: admin/index.php");
+    exit();
+}
+

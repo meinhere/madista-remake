@@ -1,0 +1,221 @@
+/* @import url("https://fonts.googleapis.com/css2?family=Montserrat&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Dosis&display=swap"); */
+
+@font-face {
+  font-family: Montserrat;
+  src: url("/fonts/Montserrat-Regular.ttf");
+}
+
+@font-face {
+  font-family: Dosis;
+  src: url("/fonts/Dosis-Regular.ttf");
+}
+
+body {
+  font-family: "Montserrat", Montserrat, sans-serif;
+  font-size: 15px;
+  overflow-x: hidden;
+}
+
+/* Display none ketika mode Desktop */
+.navbar-menu-mobile,
+.mobile-content,
+.dropdown,
+.dropdown.no-arrow .dropdown-toggle:after {
+  display: none;
+}
+
+/* Navbar */
+.navbar {
+  background: url("/img/bg-pattern.png") repeat;
+}
+.navbar .container-fluid {
+  width: 90vw;
+}
+.navbar-menu {
+  background-color: #ea7066;
+  padding: 5px 20px;
+  border-radius: 10px;
+}
+.navbar-menu a {
+  font-weight: bold;
+}
+.navbar-brand h3 {
+  font-family: "Dosis", Dosis, sans-serif;
+  font-size: 1.4em;
+  font-weight: bold;
+}
+
+/* Navigate */
+.navigate-content {
+  display: block;
+  position: fixed;
+  z-index: -1;
+  right: 3vw;
+  top: 5vh;
+  transform: translateY(-50%);
+  transition: all 0.5s;
+}
+.navigate {
+  opacity: 0.7;
+}
+.navigate:hover,
+.navigate.active {
+  opacity: 1;
+  transform: translateX(-20%);
+}
+
+/* Carousel */
+.carousel {
+  z-index: -2;
+}
+
+/* Dropdown */
+.dropdown-item {
+  font-size: 0.9em;
+}
+
+/* Section */
+.section-header h3 {
+  font-family: "Dosis", Dosis, sans-serif;
+  font-size: 2.2rem;
+  font-weight: bold;
+  color: #ea7066;
+}
+.shape {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  position: relative;
+  background-color: #9fccdf;
+  padding: 0;
+}
+.shape:after,
+.shape:before {
+  content: "";
+  height: 2px;
+  background-color: #9fccdf;
+  display: inline-block;
+  position: absolute;
+  border-radius: 2px;
+}
+.shape:before {
+  content: "";
+  width: 55px;
+  top: 11px;
+}
+.shape:after {
+  content: "";
+  width: 70px;
+  top: 6px;
+}
+.shape-right:before,
+.shape-right:after {
+  left: 3px;
+}
+.shape-left:before,
+.shape-left:after {
+  right: 3px;
+}
+
+/* Madig 3D */
+.frame-madig3d {
+  min-height: calc(100vh - 180px);
+}
+.frame-madig3d ~ a {
+  z-index: 100;
+  padding: 10px;
+  left: 10px;
+  top: 10px;
+  background: rgba(255, 255, 255, 0.9);
+}
+
+/* Footer */
+footer a {
+  text-decoration: none;
+  color: white;
+}
+footer .col-3 {
+  padding: 5px 0;
+}
+footer .col-3:hover a {
+  color: white;
+}
+footer .fb:hover {
+  cursor: pointer;
+  background-color: blue;
+}
+footer .ig:hover {
+  cursor: pointer;
+  background-color: purple;
+}
+footer .web:hover {
+  cursor: pointer;
+  background-color: orange;
+}
+footer .hp:hover {
+  cursor: pointer;
+  background-color: green;
+}
+
+/* Mobile Content */
+.content-main {
+  margin-top: 30px;
+}
+
+/* Responsive Breakpoint */
+@media screen and (max-width: 715px) {
+  .navbar-right,
+  .navbar-menu,
+  .carousel,
+  section,
+  footer span {
+    display: none;
+  }
+  .dropdown {
+    display: block;
+  }
+
+  .navbar {
+    height: 350px;
+  }
+  .navbar-menu-mobile {
+    display: block;
+  }
+  .navbar-menu-mobile .nav-item:hover,
+  .navbar-menu-mobile .nav-item.active {
+    border-radius: 20%;
+    background-color: rgba(255, 255, 255, 0.7);
+  }
+  .navbar-menu-mobile .nav-item:hover .nav-link,
+  .navbar-menu-mobile .nav-item.active .nav-link {
+    color: #dc3545;
+  }
+
+  .navigate-content {
+    display: none !important;
+  }
+
+  /* Content Madig */
+  .content-main,
+  .mobile-content {
+    display: block;
+    position: relative;
+    margin-top: -100px;
+  }
+  .mobile-content .contain {
+    border-radius: 15px;
+    border: 1px solid #2f3c4385;
+  }
+
+  /* Madig 3D */
+  .frame-madig3d {
+    min-height: calc(100vh -250px);
+  }
+
+  footer .fa {
+    padding: 5px 0;
+    font-size: 1.7em;
+  }
+}

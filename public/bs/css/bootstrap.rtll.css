@@ -1,0 +1,217 @@
+-- phpMyAdmin SQL Dump
+-- version 5.1.1
+-- https://www.phpmyadmin.net/
+--
+-- Host: 127.0.0.1
+-- Generation Time: Feb 12, 2022 at 01:59 PM
+-- Server version: 10.4.21-MariaDB
+-- PHP Version: 8.0.12
+
+SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+START TRANSACTION;
+SET time_zone = "+00:00";
+
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8mb4 */;
+
+--
+-- Database: `lapakumkm`
+--
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tb_kategori`
+--
+
+CREATE TABLE `tb_kategori` (
+  `id_kategori` int(11) NOT NULL,
+  `nama_kategori` varchar(250) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Dumping data for table `tb_kategori`
+--
+
+INSERT INTO `tb_kategori` (`id_kategori`, `nama_kategori`) VALUES
+(7, 'Kuliner'),
+(8, 'Fashion'),
+(33, 'Kerajinan Tangan');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tb_product`
+--
+
+CREATE TABLE `tb_product` (
+  `id_product` int(11) NOT NULL,
+  `nama_product` varchar(500) NOT NULL,
+  `detil_product` varchar(7500) NOT NULL,
+  `harga_product` varchar(50) NOT NULL,
+  `stok_product` int(11) NOT NULL,
+  `id_kategori` int(11) NOT NULL,
+  `id_umkm` int(11) NOT NULL,
+  `gambar_product` varchar(500) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Dumping data for table `tb_product`
+--
+
+INSERT INTO `tb_product` (`id_product`, `nama_product`, `detil_product`, `harga_product`, `stok_product`, `id_kategori`, `id_umkm`, `gambar_product`) VALUES
+(17, 'Keripik Tempe', 'Terbuat dari tempe pilihan, di racik penuh kasing sayang', '15000', 10, 7, 6, '17.jpg'),
+(18, 'Abon Lele', 'Terbuat dari lele pilihan. Nikmat tiada batas', '12000', 10, 7, 11, '18.png'),
+(19, 'Dumbleg', 'Dibuat dengan cinta. Aroma Luar Biasa Menggoda. Kenyal dan nikmat', '15000', 20, 7, 6, '19.jpg'),
+(20, 'Gethuk Pisang', 'Terbuat dari tempe pilihan, di racik penuh kasing sayang', '1000', 100, 7, 6, '20.jpg'),
+(21, 'Batik', 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Consequuntur minima quasi libero dignissimos nobis, ', '100000', 5, 8, 6, '21.jpg'),
+(22, 'Gerabah', 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Consequuntur minima quasi libero dignissimos nobis, ', '50000', 100, 33, 11, '22.jpg'),
+(23, 'Nasi Pecel', 'makanan ini biasanya dihidangkan dengan bumbu sambal kacang sebagai bahan utamanya', '5000', 120, 7, 6, '23.jpg'),
+(24, 'Tas Rotan', 'Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classica', '65000', 25, 33, 11, '24.jpg'),
+(25, 'Wayang Apik', 'sejenis kesenian wayang dari daerah Nganjuk, Jawa Timur. Kesenian tradisional ini konon mulai ada sejak tahun 1910', '800000', 10, 33, 6, '25.jpg'),
+(26, 'Vas Bambu', 'Vas dapat dikombinasikan dengan dekorasi lainnya seperti lukisan atau semacamnya untuk menambahkan nilai estetis.', '80000', 30, 33, 6, '26.jpg'),
+(27, 'Gelang Kerang', 'Gelang yang terbuat dari kerang lokal khas Nganjuk', '10000', 12, 8, 11, '27.jpg'),
+(28, 'jam tangan kayu', 'jam tangan kayu yang memiliki nuansa etnik yang dibumbui modernitas', '90000', 10, 8, 6, '28.jpg'),
+(29, 'Tas Jinjing Kipas', 'Tas jinjing yang terbuat dari anyaman enceng gondok', '70000', 5, 8, 6, '29.jpg'),
+(30, 'Tas Rajut', 'Tas yang dirajut khas buatan warga Nganjuk', '40000', 8, 8, 11, '30.jpg');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tb_slider`
+--
+
+CREATE TABLE `tb_slider` (
+  `id_slider` int(11) NOT NULL,
+  `foto_slider` varchar(600) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Dumping data for table `tb_slider`
+--
+
+INSERT INTO `tb_slider` (`id_slider`, `foto_slider`) VALUES
+(7, '7.jpg'),
+(8, '8.jpeg');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tb_umkm`
+--
+
+CREATE TABLE `tb_umkm` (
+  `id_umkm` int(11) NOT NULL,
+  `nama_umkm` varchar(50) NOT NULL,
+  `alamat_umkm` varchar(500) NOT NULL,
+  `telepon` varchar(15) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Dumping data for table `tb_umkm`
+--
+
+INSERT INTO `tb_umkm` (`id_umkm`, `nama_umkm`, `alamat_umkm`, `telepon`) VALUES
+(6, 'Bumi Melati', 'Jl. Merpati No. 02', '089695164812'),
+(11, 'Wahana Putra', 'Jl. Sedati No. 120', '089695164812');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tb_user`
+--
+
+CREATE TABLE `tb_user` (
+  `id_user` int(11) NOT NULL,
+  `email` varchar(50) NOT NULL,
+  `password` varchar(150) NOT NULL,
+  `hak_akses` varchar(100) NOT NULL,
+  `alamat` varchar(500) NOT NULL,
+  `no_telp` varchar(500) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Dumping data for table `tb_user`
+--
+
+INSERT INTO `tb_user` (`id_user`, `email`, `password`, `hak_akses`, `alamat`, `no_telp`) VALUES
+(1, 'admin', '$2y$10$oNUuhtSsgjOslSpijB4HDOmG/QuoJ25MsQFGGano7ux0FuqzkjP1W', 'admin', '', ''),
+(2, 'guest', '$2y$10$Fg45TALCU1f.iGbpeq8PR.Tx4pd5u8GcxBGgDSc1gd4pvsEzUyUJW', 'user', '', ''),
+(3, 'supri', '$2y$10$I4Ku4xUFjNtSJvDnFBvGCe.AhH47adzmy.ICKJDwlmks/1U2ugDd2', 'user', '', ''),
+(5, 'tahu@gmail.com', '$2y$10$SBJ7YPaBvPor5J3VVdPive3H1MCzSzCp3R5zb8.cDBbeot1PjYste', 'user', 'Jogomerto', '2904892309');
+
+--
+-- Indexes for dumped tables
+--
+
+--
+-- Indexes for table `tb_kategori`
+--
+ALTER TABLE `tb_kategori`
+  ADD PRIMARY KEY (`id_kategori`);
+
+--
+-- Indexes for table `tb_product`
+--
+ALTER TABLE `tb_product`
+  ADD PRIMARY KEY (`id_product`);
+
+--
+-- Indexes for table `tb_slider`
+--
+ALTER TABLE `tb_slider`
+  ADD PRIMARY KEY (`id_slider`);
+
+--
+-- Indexes for table `tb_umkm`
+--
+ALTER TABLE `tb_umkm`
+  ADD PRIMARY KEY (`id_umkm`);
+
+--
+-- Indexes for table `tb_user`
+--
+ALTER TABLE `tb_user`
+  ADD PRIMARY KEY (`id_user`);
+
+--
+-- AUTO_INCREMENT for dumped tables
+--
+
+--
+-- AUTO_INCREMENT for table `tb_kategori`
+--
+ALTER TABLE `tb_kategori`
+  MODIFY `id_kategori` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=40;
+
+--
+-- AUTO_INCREMENT for table `tb_product`
+--
+ALTER TABLE `tb_product`
+  MODIFY `id_product` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
+
+--
+-- AUTO_INCREMENT for table `tb_slider`
+--
+ALTER TABLE `tb_slider`
+  MODIFY `id_slider` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+
+--
+-- AUTO_INCREMENT for table `tb_umkm`
+--
+ALTER TABLE `tb_umkm`
+  MODIFY `id_umkm` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+
+--
+-- AUTO_INCREMENT for table `tb_user`
+--
+ALTER TABLE `tb_user`
+  MODIFY `id_user` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+COMMIT;
+
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
