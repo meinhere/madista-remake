@@ -18,10 +18,10 @@
       <i class="fa <?= ($artikel['status'] == 'draf') ? 'fa-send' : 'fa-edit' ?>"></i>
       <?= ($artikel['status'] == 'draf') ? 'Publish' : 'Edit' ?>
     </a>
-    <form action="/artikel/<?= $artikel['id'] ?>" method="POST" class="d-inline">
+    <form action="/artikel/<?= $artikel['id'] ?>" method="POST" class="d-inline" id="form-delete">
       <?= csrf_field() ?>
       <input type="hidden" name="_method" value="DELETE">
-      <button type="submit" class="btn btn-danger" onclick="return confirm('Apakah anda yakin?')">
+      <button type="submit" class="btn btn-danger" id="btn-delete">
         <i class="fa fa-trash"></i>
         Hapus
       </button>
@@ -33,9 +33,9 @@
     <div class="row justify-content-center mt-4">
       <input type="hidden" name="slug" value="<?= $artikel['slug'] ?>">
       <div class="col-12">
+        <script src="<?= base_url(); ?>/ckeditor/ckeditor.js"></script>
         <div class="form-group">
-          <input id="konten_artikel" type="hidden" name="konten_artikel" value="<?= old('konten_artikel', $artikel['konten_artikel']) ?>">
-          <trix-editor input="konten_artikel"></trix-editor>
+          <textarea name="konten_artikel" id="konten_artikel" rows="10" cols="80"><?= old('konten_artikel', $artikel['konten_artikel']); ?></textarea>
         </div>
 
         <button class="btn btn-primary" type="submit">
@@ -47,10 +47,39 @@
   </form>
 </div>
 
+<script src="<?= base_url() ?>/swal/sweetalert2.min.js"></script>
 <script>
+  // CK Editor Function
+  CKEDITOR.replace('konten_artikel', {
+    removePlugins: 'image',
+  });
+
   // Trix File Remove Function
   document.addEventListener("trix-file-accept", function(e) {
     e.preventDefault();
+  });
+
+  // Confirm Delete
+  let btnDelete = document.getElementById('btn-delete');
+  let formDelete = document.getElementById('form-delete');
+
+  btnDelete.addEventListener('click', function(e) {
+    e.preventDefault();
+
+    Swal.fire({
+      title: 'Apakah kamu yakin?',
+      text: "data yang telah dihapus tidak akan kembali lagi!",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Ya, saya yakin!',
+      cancelButtonText: 'Batal'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        formDelete.submit()
+      }
+    })
   });
 </script>
 <?= $this->endSection() ?>

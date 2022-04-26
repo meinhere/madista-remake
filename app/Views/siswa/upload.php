@@ -21,17 +21,11 @@
   <hr class="sidebar-divider d-block my-4 mb-3">
 
   <div class="ms-5">
-    <?php if (session()->getFlashData('success')) : ?>
-      <div class="alert alert-success alert-dismissible fade show" role="alert">
-        <?= session()->getFlashdata('success') ?>
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-      </div>
-    <?php endif ?>
     <div class="title fw-bold">
       <i class="fa fa-image"></i>
       <span>Karyaku</span>
     </div>
-    <div class="row">
+    <div class="row row-madig">
       <?php $i = 1; ?>
       <?php if (count($madig)) : ?>
         <?php foreach ($madig as $item) : ?>
@@ -44,11 +38,11 @@
             </span>
             <img src="/img/madig/<?= $item['image'] ?>" class="img-fluid img-thumbnail" width="250">
 
-            <form action="/karya/<?= $item['id'] ?>" method="POST" class="mt-2">
+            <form action="/karya/<?= $item['id'] ?>" method="POST" class="mt-2" id="form-delete">
               <?= csrf_field() ?>
               <input type="hidden" name="_method" value="DELETE">
-              <button type="submit" class="btn btn-outline-danger rounded-1 py-2" onclick="return confirm('Apakah anda yakin?')">
-                <i class="fa fa-trash"></i>
+              <button type="submit" class="btn btn-outline-danger rounded-1 py-2" id="btn-delete" data-id="<?= $item['id']; ?>">
+                <i class="fa fa-trash" data-id="<?= $item['id']; ?>"></i>
               </button>
             </form>
           </div>
@@ -61,4 +55,52 @@
   </div>
 
 </div>
+
+<script src="<?= base_url() ?>/swal/sweetalert2.min.js"></script>
+<script>
+  const notification = "<?= session()->getFlashdata('success'); ?>";
+
+  if (notification) {
+    const Toast = Swal.mixin({
+      toast: true,
+      position: 'top-end',
+      showConfirmButton: false,
+      timer: 3000,
+      timerProgressBar: true,
+    })
+
+    Toast.fire({
+      icon: 'success',
+      title: notification
+    })
+  }
+
+  let rowMadig = document.querySelector('.row-madig');
+  let btnManage = document.querySelector('.btn-manage-madig');
+  let formDelete = document.getElementById('form-delete');
+
+  rowMadig.addEventListener('click', function(e) {
+    if (e.target.tagName == 'BUTTON' || e.target.tagName == 'I') {
+
+      e.preventDefault();
+
+      Swal.fire({
+        title: 'Apakah kamu yakin?',
+        text: "data yang telah dihapus tidak akan kembali lagi!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Ya, saya yakin!',
+        cancelButtonText: 'Batal'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          let id = e.target.getAttribute('data-id');
+          formDelete.setAttribute('action', '/karya/' + id);
+          formDelete.submit();
+        }
+      })
+    }
+  })
+</script>
 <?= $this->endSection() ?>

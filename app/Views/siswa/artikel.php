@@ -4,12 +4,12 @@
 <div class="container">
   <div class="row justify-content-center">
     <div class="col-10">
-      <?php if (session()->getFlashData('success')) : ?>
+      <!-- <?php if (session()->getFlashData('success')) : ?>
         <div class="alert alert-success alert-dismissible fade show" role="alert">
           <?= session()->getFlashdata('success') ?>
           <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
-      <?php endif ?>
+      <?php endif ?> -->
       <div class="accordion" id="accordionExample">
         <div class="accordion-item">
           <h4 class="accordion-header" id="headingOne">
@@ -25,7 +25,7 @@
                   <div class="card mt-3">
                     <div class="row g-0">
                       <div class="col-md-4">
-                        <img src="<?= ($item['thumbnail'] != null) ? '/img/thumbnail/' . $item['thumbnail'] : '/img/no-image.png' ?>" alt="<?= $item['judul'] ?>" class="img-fluid">
+                        <img src="<?= ($item['thumbnail'] != null) ? '/img/thumbnail/' . $item['thumbnail'] : '/img/no-image.png' ?>" alt="<?= $item['judul'] ?>" class="img-fluid h-100">
                       </div>
                       <div class="col-md-8">
                         <div class="card-body">
@@ -60,7 +60,7 @@
                   <div class="card mt-3">
                     <div class="row g-0">
                       <div class="col-md-4">
-                        <img src="/img/thumbnail/<?= $item['thumbnail'] ?>" alt="<?= $item['judul'] ?>" class="img-fluid">
+                        <img src="/img/thumbnail/<?= $item['thumbnail'] ?>" alt="<?= $item['judul'] ?>" class="img-fluid h-100">
                       </div>
                       <div class="col-md-8">
                         <div class="card-body">
@@ -85,4 +85,25 @@
     </div>
   </div>
 </div>
+
+
+<script src="<?= base_url() ?>/swal/sweetalert2.min.js"></script>
+<script>
+  const notification = "<?= session()->getFlashdata('success'); ?>";
+
+  if (notification) {
+    const Toast = Swal.mixin({
+      toast: true,
+      position: 'top-end',
+      showConfirmButton: false,
+      timer: 3000,
+      timerProgressBar: true,
+    })
+
+    Toast.fire({
+      icon: 'success',
+      title: notification
+    })
+  }
+</script>
 <?= $this->endSection() ?>

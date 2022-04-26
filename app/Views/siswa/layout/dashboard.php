@@ -13,6 +13,7 @@
   <!-- CSS asset template-->
   <link href="<?= base_url() ?>/bs/css/bootstrap.min.css" rel="stylesheet" type="text/css">
   <link href="<?= base_url() ?>/trix/trix.css" rel="stylesheet" type="text/css">
+  <link href="<?= base_url() ?>/swal/sweetalert2.min.css" rel="stylesheet" type="text/css">
 
   <!-- Custom styles for this template-->
   <link href="<?= base_url() ?>/dashboard/css/sb-admin-2.min.css" rel="stylesheet">
